@@ -7,14 +7,16 @@
   <h2 id="title">Electric Chill Machiine</h2>
 
   <h3 id="artiist">Jacinto</h3>
-  <audio ref="audio" src="./assets/jacinto-1.mp3" ></audio>
-  <div class="progress-container" id="progress-container">
-    <div class="progress" id="progress">
-      <div class="duration-wrapper">
-        <span id="current-time">0:00</span>
-        <span id="duration">2:06</span>
-    </div>
+  <audio ref="audio" src="./assets/jacinto-1.mp3"  @timeupdate="updateprogress"
+        @canplay="updateprogress" ></audio>
+  <div class="progress-container" id="progress-container" @click="setProgress($event)" ref="progressRange">
+    <div class="progress"  id="progress" :style="{width: progressBarWidth}">
+     
   </div>
+   <div class="duration-wrapper">
+        <span id="current-time">{{currentTime}}</span>
+        <span id="duration">{{duration}}</span>
+    </div>
   <div class="player-controls">
    <font-awesome-icon icon="backward" class="fas" title="backword" />
     <font-awesome-icon :icon="playStatus" class="fas" title="play" id="play-btn" @click="play" />
@@ -32,7 +34,10 @@ export default {
  },
  data(){
    return{
-playStatus: "pause"
+playStatus: "play",
+progressBarWidth:0,
+currentTime:0,
+duration:0,
  }
  },
  methods:{
@@ -46,8 +51,29 @@ playStatus: "pause"
        this.showPlayBtn()
       }
     },
+
     showPlayBtn(){
  this.playStatus = "play"
+    },
+    displayTime(time){
+     const minutes= Math.floor(time / 60)
+     let seconds=Math.floor(time % 60)
+     seconds = seconds>9 ? seconds :`0${seconds}`;
+     return`${minutes}:${seconds}`;
+   },
+    updateprogress(){
+      const audio = this.$refs["audio"];
+      this.progressBarWidth=`${(audio.currentTime*100)/audio.duration}%`
+     this.currentTime =`${this.displayTime(audio.currentTime)}/`;
+      this.duration = `${this.displayTime(audio.duration)}`;
+    },
+    setProgress(e){
+      console.log('e.offsetX---->', e)
+      const audio = this.$refs["audio"];
+      const progressRange= this.$refs["progressRange"]
+      const newTime = e.offsetX / progressRange.offsetWidth
+      this.progressBarWidth = `${newTime*100}%`;
+      audio.currentTime = newTime * audio.duration
     },
  },
 };
@@ -93,7 +119,7 @@ left: 50px;
 .duration-wrapper{
   display: flex;
   color: black;
-  width: 49vw;
+  width: 100%;
   justify-content: space-between;
    position: relative;
   top: -25px;
@@ -114,7 +140,7 @@ h3{
 }
 .player-controls{
   position: relative;
-  top: 17px;
+  top: 10px;
   left: 106px;
   width: 200px;
 }

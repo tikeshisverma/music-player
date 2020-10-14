@@ -2,12 +2,12 @@
 <div class="app">
 <div class="player-container">
   <div class="img-container">
-    <img src="./assets/jacinto-1.jpg" alt="Album Art">
+    <img :src="img" alt="Album Art">
   </div>
-  <h2 id="title">Electric Chill Machiine</h2>
+  <h2 id="title">{{songName}}</h2>
 
-  <h3 id="artiist">Jacinto</h3>
-  <audio ref="audio" src="./assets/jacinto-1.mp3"  @timeupdate="updateprogress"
+  <h3 id="artist">{{artist}}</h3>
+  <audio ref="audio" :src="music"  @timeupdate="updateprogress"
         @canplay="updateprogress" ></audio>
   <div class="progress-container" id="progress-container" @click="setProgress($event)" ref="progressRange">
     <div class="progress"  id="progress" :style="{width: progressBarWidth}">
@@ -18,13 +18,14 @@
         <span id="duration">{{duration}}</span>
     </div>
   <div class="player-controls">
-   <font-awesome-icon icon="backward" class="fas" title="backword" />
+   <font-awesome-icon icon="backward" class="fas" title="backword" @click="backWard" />
     <font-awesome-icon :icon="playStatus" class="fas" title="play" id="play-btn" @click="play" />
-    <font-awesome-icon icon="forward" class="fas" title="forword"  />
+    <font-awesome-icon icon="forward" class="fas" title="forword" @click="forWard" />
   </div>
 </div>
 </div>
 </div>
+
 </template>
 
 <script>
@@ -38,7 +39,36 @@ playStatus: "play",
 progressBarWidth:0,
 currentTime:0,
 duration:0,
+img:'',
+currentSong: 0,
+songs:[{
+  name:'jacinto-1',
+  displayName:'Electric Chill Machine',
+  artist:'Jacinto Design'
+},
+{
+  name:'jacinto-2',
+  displayName:'Seven Nation Army(Remix)',
+  artist:'Jacinto Design'
+},
+{
+  name:'jacinto-3',
+  displayName:'Goodnight Disco Queen',
+  artist:'Jacinto Design'
+},
+{
+  name:'metric-1',
+  displayName:'Front Row(Remix)',
+  artist:'Metric/Jacinto Design'
+},
+],
+songName:'',
+artist:'',
+music:'',
  }
+ },
+ mounted(){
+this.loadSong(this.songs[this.currentSong])
  },
  methods:{
  play() {
@@ -51,6 +81,36 @@ duration:0,
        this.showPlayBtn()
       }
     },
+
+loadSong(song){
+  console.log(song)
+  this.songName =song.displayName
+  this.artist = song.artist
+this.music= require(`./assets/${song.name}.mp3`)
+this.img =  require(`./assets/${song.name}.jpg`)
+this.currentTime = 0
+
+},
+
+backWard(){
+if(this.currentSong== 0){
+  this.currentSong = 0
+}else {
+  this.currentSong = this.currentSong - 1
+}
+
+this.loadSong(this.songs[this.currentSong])
+},
+forWard(){
+  if(this.currentSong== 3){
+  this.currentSong = 3
+}else {
+  this.currentSong = this.currentSong + 1
+}
+this.loadSong(this.songs[this.currentSong])
+
+},
+
 
     showPlayBtn(){
  this.playStatus = "play"
